@@ -2,117 +2,104 @@ const { convertAllEscapes } = require("./conversionfunctions")
 const { indexes } = require('./indexes')
 const conversion = require('./conversion')
 
+const encodelist = [
+    { "name": "utf8", "encode": function(x) { return conversion.utf8Encoder(x) }, "decode": function(x) { return conversion.utf8Decoder(x) }, },
+    { "name": "big5", "encode": function(x) { return conversion.big5Encoder(x) }, "decode": function(x) { return conversion.big5Decoder(x) }, },
+    { "name": "euc-jp", "encode": function(x) { return conversion.eucjpEncoder(x) }, "decode": function(x) { return conversion.eucjpDecoder(x) }, },
+    { "name": "iso-2022-jp ", "encode": function(x) { return conversion.iso2022jpEncoder(x) }, "decode": function(x) { return conversion.iso2022jpDecoder(x) }, },
+    { "name": "shift_jis", "encode": function(x) { return conversion.sjisEncoder(x) }, "decode": function(x) { return conversion.sjisDecoder(x) }, },
+    { "name": "euc-kr", "encode": function(x) { return conversion.euckrEncoder(x) }, "decode": function(x) { return conversion.euckrDecoder(x) }, },
+    { "name": "gb18030", "encode": function(x) { return conversion.gbEncoder(x, false) }, "decode": function(x) { return conversion.gbDecoder(x, false) }, },
+    { "name": "gbk", "encode": function(x) { return conversion.gbEncoder(x, true) }, "decode": function(x) { return conversion.gbDecoder(x, true) }, },
+    { "name": "koi8-r", "encode": function(x) { return conversion.sbEncoder(x, indexes.koi8r) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.koi8r) }, },
+    { "name": "koi8-u", "encode": function(x) { return conversion.sbEncoder(x, indexes.koi8u) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.koi8u) }, },
+    { "name": "windows-1250", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1250) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1250) }, },
+    { "name": "windows-1251", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1251) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1251) }, },
+    { "name": "windows-1252/latin1", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1252) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1252) }, },
+    { "name": "windows-1253", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1253) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1253) }, },
+    { "name": "windows-1254", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1254) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1254) }, },
+    { "name": "windows-1255", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1255) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1255) }, },
+    { "name": "windows-1256", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1256) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1256) }, },
+    { "name": "windows-1257", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1257) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1257) }, },
+    { "name": "windows-1258", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows1258) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows1258) }, },
+    { "name": "windows-874", "encode": function(x) { return conversion.sbEncoder(x, indexes.windows874) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.windows874) }, },
+    { "name": "macintosh ", "encode": function(x) { return conversion.sbEncoder(x, indexes.macintosh) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.macintosh) }, },
+    { "name": "ibm866", "encode": function(x) { return conversion.sbEncoder(x, indexes.ibm866) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.ibm866) }, },
+    { "name": "x-mac-cyrillic", "encode": function(x) { return conversion.sbEncoder(x, indexes.xmaccyrillic) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.xmaccyrillic) }, },
+    { "name": "iso-8859-2", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88592) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88592) }, },
+    { "name": "iso-8859-3", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88593) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88593) }, },
+    { "name": "iso-8859-4", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88594) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88594) }, },
+    { "name": "iso-8859-5", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88595) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88595) }, },
+    { "name": "iso-8859-6", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88596) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88596) }, },
+    { "name": "iso-8859-7", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88597) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88597) }, },
+    { "name": "iso-8859-8", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88598) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88598) }, },
+    { "name": "iso-8859-8-i", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso88598) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso88598) }, },
+    { "name": "iso-8859-10", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885910) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885910) }, },
+    { "name": "iso-8859-13", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885913) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885913) }, },
+    { "name": "iso-8859-14", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885914) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885914) }, },
+    { "name": "iso-8859-15", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885915) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885915) }, },
+    { "name": "iso-8859-16", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885916) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885916) }, },
+]
+
+const testlist = ['utf8', 'big5', 'gbk', 'windows-1252/latin1']
+
 var str = "娴嬭瘯"
 var a = convertAllEscapes(str)
-var list = encode(a)
+var list = encode(a, testlist)
 list.forEach(element =>
 {
-    if (element.class == true)
+    if (element.valuable == true)
     {
-        var list2 = decode(element.result)
+        var list2 = decode(element.encode, testlist)
         list2.forEach(item => {
-            if (item.class == true) {
-                console.log(`${element.name} -> ${item.name} : ${item.result}`)
+            if (item.valuable == true && element.name != item.name) {
+                console.log(`${element.name} -> ${item.name} : ${item.decode}`)
             }
         })
     }
 });
 
 
-function encode(stream)
-{
-    var list = [
-        { "name": "utf8", "result": conversion.utf8Encoder(stream), },
-        { "name": "big5", "result": conversion.big5Encoder(stream), },
-        { "name": "euc-jp", "result": conversion.eucjpEncoder(stream), },
-        { "name": "iso-2022-jp ", "result": conversion.iso2022jpEncoder(stream), },
-        { "name": "shift_jis", "result": conversion.sjisEncoder(stream), },
-        { "name": "euc-kr", "result": conversion.euckrEncoder(stream), },
-        { "name": "gb18030", "result": conversion.gbEncoder(stream, false), },
-        { "name": "gbk", "result": conversion.gbEncoder(stream, true), },
-        { "name": "koi8-r", "result": conversion.sbEncoder(stream, indexes.koi8r), },
-        { "name": "koi8-u", "result": conversion.sbEncoder(stream, indexes.koi8u), },
-        { "name": "windows-1250", "result": conversion.sbEncoder(stream, indexes.windows1250), },
-        { "name": "windows-1251", "result": conversion.sbEncoder(stream, indexes.windows1251), },
-        { "name": "windows-1252/latin1", "result": conversion.sbEncoder(stream, indexes.windows1252), },
-        { "name": "windows-1253", "result": conversion.sbEncoder(stream, indexes.windows1253), },
-        { "name": "windows-1254", "result": conversion.sbEncoder(stream, indexes.windows1254), },
-        { "name": "windows-1255", "result": conversion.sbEncoder(stream, indexes.windows1255), },
-        { "name": "windows-1256", "result": conversion.sbEncoder(stream, indexes.windows1256), },
-        { "name": "windows-1257", "result": conversion.sbEncoder(stream, indexes.windows1257), },
-        { "name": "windows-1258", "result": conversion.sbEncoder(stream, indexes.windows1258), },
-        { "name": "windows-874", "result": conversion.sbEncoder(stream, indexes.windows874), },
-        { "name": "macintosh ", "result": conversion.sbEncoder(stream, indexes.macintosh), },
-        { "name": "ibm866", "result": conversion.sbEncoder(stream, indexes.ibm866), },
-        { "name": "x-mac-cyrillic", "result": conversion.sbEncoder(stream, indexes.xmaccyrillic), },
-        { "name": "iso-8859-2", "result": conversion.sbEncoder(stream, indexes.iso88592), },
-        { "name": "iso-8859-3", "result": conversion.sbEncoder(stream, indexes.iso88593), },
-        { "name": "iso-8859-4", "result": conversion.sbEncoder(stream, indexes.iso88594), },
-        { "name": "iso-8859-5", "result": conversion.sbEncoder(stream, indexes.iso88595), },
-        { "name": "iso-8859-6", "result": conversion.sbEncoder(stream, indexes.iso88596), },
-        { "name": "iso-8859-7", "result": conversion.sbEncoder(stream, indexes.iso88597), },
-        { "name": "iso-8859-8", "result": conversion.sbEncoder(stream, indexes.iso88598), },
-        { "name": "iso-8859-8-i", "result": conversion.sbEncoder(stream, indexes.iso88598), },
-        { "name": "iso-8859-10", "result": conversion.sbEncoder(stream, indexes.iso885910), },
-        { "name": "iso-8859-13", "result": conversion.sbEncoder(stream, indexes.iso885913), },
-        { "name": "iso-8859-14", "result": conversion.sbEncoder(stream, indexes.iso885914), },
-        { "name": "iso-8859-15", "result": conversion.sbEncoder(stream, indexes.iso885915), },
-        { "name": "iso-8859-16", "result": conversion.sbEncoder(stream, indexes.iso885916), },
-    ]
 
-    for (var t = 0; t < list.length; t++)
-    {
-        if (list[t].result.match('&')) list[t].class = false
-        else if (list[t].result != '') list[t].class = true
+function encode(stream,name)
+{   
+    let newlist = []
+    for (let n = 0; n < name.length; n++){
+        for (let t = 0; t < encodelist.length; t++) {
+            if (name[n] == encodelist[t].name)
+            {
+                const encode = encodelist[t].encode(stream)
+                newlist.push({
+                    "name": name[n],
+                    "encode": encode,
+                    "valuable": (encode != '' && !encode.match('&')) ? true: false,
+                })                
+            }
+        }
     }
     //console.log(JSON.stringify(list, null, 4))
-    return list
+    return newlist
 }
 
-function decode(stream)
-{
-    var list =[
-    { "name": "utf8", "result": conversion.utf8Decoder(stream) },
-    { "name": "big5", "result": conversion.big5Decoder(stream) },
-    { "name": "euc-jp", "result": conversion.eucjpDecoder(stream) },
-    { "name": "iso-2022-jp", "result": conversion.iso2022jpDecoder(stream) },
-    { "name": "shift_jis", "result": conversion.sjisDecoder(stream) },
-    { "name": "euc-kr", "result": conversion.euckrDecoder(stream) },
-    { "name": "gb18030", "result": conversion.gbDecoder(stream) },
-    { "name": "gbk", "result": conversion.gbDecoder(stream) },
-    { "name": "koi8-r", "result": conversion.sbDecoder(stream, indexes.koi8r) },
-    { "name": "koi8-u", "result": conversion.sbDecoder(stream, indexes.koi8u) },
-    { "name": "windows-1250", "result": conversion.sbDecoder(stream, indexes.windows1250) },
-    { "name": "windows-1251", "result": conversion.sbDecoder(stream, indexes.windows1251) },
-    { "name": "windows-1252/latin1", "result": conversion.sbDecoder(stream, indexes.windows1252) },
-    { "name": "windows-1253", "result": conversion.sbDecoder(stream, indexes.windows1253) },
-    { "name": "windows-1254", "result": conversion.sbDecoder(stream, indexes.windows1254) },
-    { "name": "windows-1255", "result": conversion.sbDecoder(stream, indexes.windows1255) },
-    { "name": "windows-1256", "result": conversion.sbDecoder(stream, indexes.windows1256) },
-    { "name": "windows-1257", "result": conversion.sbDecoder(stream, indexes.windows1257) },
-    { "name": "windows-1258", "result": conversion.sbDecoder(stream, indexes.windows1258) },
-    { "name": "windows-874", "result": conversion.sbDecoder(stream, indexes.windows874) },
-    { "name": "macintosh", "result": conversion.sbDecoder(stream, indexes.macintosh) },
-    { "name": "ibm866", "result": conversion.sbDecoder(stream, indexes.ibm866) },
-    { "name": "x-mac-cyrillic", "result": conversion.sbDecoder(stream, indexes.xmaccyrillic) },
-    { "name": "iso-8859-2", "result": conversion.sbDecoder(stream, indexes.iso88592) },
-    { "name": "iso-8859-3", "result": conversion.sbDecoder(stream, indexes.iso88593) },
-    { "name": "iso-8859-4", "result": conversion.sbDecoder(stream, indexes.iso88594) },
-    { "name": "iso-8859-5", "result": conversion.sbDecoder(stream, indexes.iso88595) },
-    { "name": "iso-8859-6", "result": conversion.sbDecoder(stream, indexes.iso88596) },
-    { "name": "iso-8859-7", "result": conversion.sbDecoder(stream, indexes.iso88597) },
-    { "name": "iso-8859-8", "result": conversion.sbDecoder(stream, indexes.iso88598) },
-    { "name": "iso-8859-8-i", "result": conversion.sbDecoder(stream, indexes.iso88598) },
-    { "name": "iso-8859-10", "result": conversion.sbDecoder(stream, indexes.iso885910) },
-    { "name": "iso-8859-13", "result": conversion.sbDecoder(stream, indexes.iso885913) },
-    { "name": "iso-8859-14", "result": conversion.sbDecoder(stream, indexes.iso885914) },
-    { "name": "iso-8859-15", "result": conversion.sbDecoder(stream, indexes.iso885915) },
-    { "name": "iso-8859-16", "result": conversion.sbDecoder(stream, indexes.iso885916) },
-    ]
-    for (var t = 0; t < list.length; t++)
+function decode(stream,name)
+{    
+    let newlist = []
+    for (let n = 0; n < name.length; n++)
     {
-        if (list[t].result.match('�')) list[t].class = false
-        else if (list[t].result != '') list[t].class = true
+        for (let t = 0; t < encodelist.length; t++)
+        {
+            if (name[n] == encodelist[t].name)
+            {
+                const decode = encodelist[t].decode(stream)
+                newlist.push(
+                {
+                    "name": name[n],
+                    "decode": decode,
+                    "valuable": (decode != '' && !decode.match('�')) ? true: false,
+                })
+            }
+        }
     }
-    return list
+    //console.log(JSON.stringify(list, null, 4))
+    return newlist
 }
