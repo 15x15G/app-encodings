@@ -41,39 +41,42 @@ const encodelist = [
     { "name": "iso-8859-16", "encode": function(x) { return conversion.sbEncoder(x, indexes.iso885916) }, "decode": function(x) { return conversion.sbDecoder(x, indexes.iso885916) }, },
 ]
 
-const testlist = ['utf8', 'big5', 'gbk', 'windows-1252/latin1']
-
-var str = "娴嬭瘯"
-var a = convertAllEscapes(str)
-var list = encode(a, testlist)
-list.forEach(element =>
+function output(str = "娴嬭瘯", testlist = ['utf8', 'big5', 'gbk', 'windows-1252/latin1'])
 {
-    if (element.valuable == true)
+    var a = convertAllEscapes(str)
+    var list = encode(a, testlist)
+    list.forEach(element =>
     {
-        var list2 = decode(element.encode, testlist)
-        list2.forEach(item => {
-            if (item.valuable == true && element.name != item.name) {
-                console.log(`${element.name} -> ${item.name} : ${item.decode}`)
-            }
-        })
-    }
-});
+        if (element.valuable == true)
+        {
+            var list2 = decode(element.encode, testlist)
+            list2.forEach(item =>
+            {
+                if (item.valuable == true && element.name != item.name)
+                {
+                    console.log(`${element.name} -> ${item.name} : ${item.decode}`)
+                }
+            })
+        }
+    });
+}
 
-
-
-function encode(stream,name)
-{   
+function encode(stream, name)
+{
     let newlist = []
-    for (let n = 0; n < name.length; n++){
-        for (let t = 0; t < encodelist.length; t++) {
+    for (let n = 0; n < name.length; n++)
+    {
+        for (let t = 0; t < encodelist.length; t++)
+        {
             if (name[n] == encodelist[t].name)
             {
                 const encode = encodelist[t].encode(stream)
-                newlist.push({
+                newlist.push(
+                {
                     "name": name[n],
                     "encode": encode,
-                    "valuable": (encode != '' && !encode.match('&')) ? true: false,
-                })                
+                    "valuable": (encode != '' && !encode.match('&')) ? true : false,
+                })
             }
         }
     }
@@ -81,8 +84,8 @@ function encode(stream,name)
     return newlist
 }
 
-function decode(stream,name)
-{    
+function decode(stream, name)
+{
     let newlist = []
     for (let n = 0; n < name.length; n++)
     {
@@ -95,7 +98,7 @@ function decode(stream,name)
                 {
                     "name": name[n],
                     "decode": decode,
-                    "valuable": (decode != '' && !decode.match('�')) ? true: false,
+                    "valuable": (decode != '' && !decode.match('�')) ? true : false,
                 })
             }
         }
@@ -103,3 +106,5 @@ function decode(stream,name)
     //console.log(JSON.stringify(list, null, 4))
     return newlist
 }
+
+export default output
